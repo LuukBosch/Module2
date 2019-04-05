@@ -192,5 +192,5 @@ To report bugs (with sample code) or request a feature, please see:
     http://bugs.sun.com/
     http://bugreport.sun.com/bugreport/
 
-Bug reports with specific, reproducible test cases are greatly
+Bug reports with specific, reproducible @Test cases are greatly
 appreciated!

@@ -80,7 +80,7 @@ The application you will be making consists of two parts:
    Hint: to verify your README contains all the required steps, checkout your project into a new directory on a different client and server than your own and follow the instructions yourself.
  - Any necessary but non-standard predefined classes and libraries should be included in JARs.
  - Typical causes that make the installation and compilation procedure fail are names and paths or hardcoded URLs, so make sure to not use any.
- Test this before submitting your project.
+ @Test this before submitting your project.
 
 ##### Report
 
@@ -131,14 +131,14 @@ Use it to keep track of and judge your own progress.
  - Exception mechanisms are used appropriately.
  - Concurrency constructs are used properly.
 
-##### Testing
+##### @Testing
 
- - Appropriate unit tests are provided.
- - Appropriate system tests are provided.
- - Sufficient test coverage is reached.
- - Tests are well documented, or better: the tests are self-documenting (a testable code base with good test can be self-documenting).
- - All classes in the system have been tested by unit testing.
- - All tests pass.
+ - Appropriate unit @Tests are provided.
+ - Appropriate system @Tests are provided.
+ - Sufficient @Test coverage is reached.
+ - @Tests are well documented, or better: the @Tests are self-documenting (a @Testable code base with good @Test can be self-documenting).
+ - All classes in the system have been @Tested by unit @Testing.
+ - All @Tests pass.
 
 ## Organisational overview Calendar
 
@@ -155,7 +155,7 @@ Use it to keep track of and judge your own progress.
 ## Image
 
 You will be provided with a Raspberry Pi 3B+ starter kit.
-The Pi is pre-installed with the latest Raspbian image.
+The Pi is pre-installed with the la@Test Raspbian image.
 This is a minimal Linux distribution without a graphical interface.
 
 A Java SDK is also installed including the Java Cryptography Extension (JCE).
