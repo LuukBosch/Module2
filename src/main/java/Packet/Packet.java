@@ -1,11 +1,20 @@
 package Packet;
 
+import java.util.Arrays;
+
 public class Packet {
     private LTPHeader header;
     private byte[] data;
 
     public Packet(){
         header = new LTPHeader();
+    }
+
+    public Packet(byte[] packet){
+        header = new LTPHeader(Arrays.copyOfRange(packet, 0, 9));
+        if(packet.length > LTPHeader.SIZE) {
+            data = Arrays.copyOfRange(packet, 9, packet.length);
+        }
     }
 
     public void addData(byte[] data){

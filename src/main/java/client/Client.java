@@ -19,7 +19,7 @@ public class Client {
 
     public static void main(String args[]) throws IOException {
         Client client = new Client();
-        while(!client.isConnected()) {
+
             client.broadcast("Hello", InetAddress.getByName("255.255.255.255"));
             try {
                 Thread.sleep(1000);
@@ -27,7 +27,7 @@ public class Client {
                 e.printStackTrace();
             }
             client.receiveHello();
-         }
+
         ConnectionHandler connectionHandler = new ConnectionHandler(client.getHello().getPort(), client.getHello().getAddress());
         }
 

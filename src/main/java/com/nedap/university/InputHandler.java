@@ -13,7 +13,7 @@ public class InputHandler {
     }
 
     public DatagramPacket getReply(DatagramPacket input){
-        if(!connectionHandler.isConnected()) {
+        if(true) {
             System.out.println(new String(input.getData()));
         }
         return null;
