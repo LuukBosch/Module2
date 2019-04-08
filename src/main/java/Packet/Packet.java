@@ -17,6 +17,7 @@ public class Packet {
         }
     }
 
+
     public void addData(byte[] data){
         this.data = new byte[data.length];
         this.data = data;

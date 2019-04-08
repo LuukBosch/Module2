@@ -20,7 +20,11 @@ public class Tryanderror {
             luuk.setAckNum(100);
             System.out.println(luuk.getAckNum());
             Integer test = 1;
-
+            byte[] test1 = new byte[4];
+            byte[] test2 = new byte[4];
+            test1[3] = 8;
+            test2[3] = 8;
+           System.out.println(Arrays.equals(test1,test2));
 
 
         }
