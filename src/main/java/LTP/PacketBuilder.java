@@ -19,6 +19,8 @@ public class PacketBuilder {
         synMessage.getHeader().setSeqNum(random.nextInt());
         synMessage.getHeader().setSynFlag();
         synMessage.getHeader().setConnectionNum(random.nextInt() & 0xFFFF);//TODO prevent double connectionNum, Generate connection LTPConnection???
+        synMessage.setChecksum();
+        System.out.println("Checksum Send is: " + synMessage.getHeader().getChecksum());
         return  synMessage;
     }
 
@@ -29,6 +31,7 @@ public class PacketBuilder {
         synAckMessage.getHeader().setSynFlag();
         synAckMessage.getHeader().setAckFlag();
         synAckMessage.getHeader().setConnectionNum(input.getHeader().getConnectionNum());
+        synAckMessage.setChecksum();
         return synAckMessage;
     }
 
@@ -40,6 +43,7 @@ public class PacketBuilder {
         String payload = "GET/"+file;
         request.addData(payload.getBytes());
         request.getHeader().setSeqNum(input.getHeader().getAckNum() + payload.length());
+        request.setChecksum();
         return request;
     }
 

@@ -5,6 +5,7 @@ import Packet.Packet;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 public class LTPConnection {
     private LTPHandler ltpHandler;
@@ -12,6 +13,8 @@ public class LTPConnection {
     private InetAddress address;
     private int port;
     private int connectionNum;
+    private boolean sending = false;
+    private boolean receiving = false;
     public boolean fileToRequest;
     public String desiredFile;
 
@@ -24,10 +27,7 @@ public class LTPConnection {
     }
 
     public void handleMessage(Packet input){
-
-
         if(input.getHeader().getSynFlag() && !input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){       //SYN Message
-
             connectionNum = input.getHeader().getConnectionNum();
             sendSynAck(input);
         } else if(input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){ //SYN/ack Message
@@ -35,15 +35,28 @@ public class LTPConnection {
             if(fileToRequest){
                sendFileRequest(input);
             }
-
-        } else if(!input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){ //ACK message
-
+        } else if(!input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()) { //ACK message
+            handleAckMessage(input);
         } else if(!input.getHeader().getSynFlag() && !input.getHeader().getAckFlag() && input.getHeader().getFinFlag()){ //FinMessage
 
         } else{
             System.out.println("helaas");
         }
+    }
 
+    public void handleAckMessage(Packet input){
+        if("GET/".equals(new String(Arrays.copyOfRange(input.getData(), 0, 4)))){
+            sending = true;
+
+
+        } else if("POST/".equals(new String(Arrays.copyOfRange(input.getData(), 0, 5)))){
+            receiving = true;
+
+        } else if(sending){
+
+        } else if(receiving){
+
+        }
 
     }
 

@@ -6,10 +6,11 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 public class LTPHeader {
-    public static final int SIZE =11;
-    private byte[] header = new byte[11];
+    public static final int SIZE =15;
+    private byte[] header = new byte[15];
     private int seqNum;
     private int ackNum;
+    private int checksum;
     private int connectionNum;
     private BitSet flags = new BitSet(3);
 
@@ -24,14 +25,10 @@ public class LTPHeader {
         setAckNum(Arrays.copyOfRange(header, 4, 8));
         setFlags(header[8]);
         setConnectionNum(Arrays.copyOfRange(header, 9, 11));
+        setChecksum(Arrays.copyOfRange(header, 11, 15));
     }
 
     //---------------------Setters--------------------------------
-
-
-    public void setChecksum(){
-
-    }
 
     public void setFlag(int flag) {
         flags.set(flag);
@@ -93,6 +90,21 @@ public class LTPHeader {
         header[3] = (byte) (this.seqNum & 255);
     }
 
+    public void setChecksum(long checksum){
+        this.checksum = (int) checksum;
+        header[11] = (byte) ((this.checksum & -16777216) >> 24);
+        header[12] = (byte) ((this.checksum & 16711680) >> 16);
+        header[13] = (byte) ((this.checksum & 65280) >> 8);
+        header[14] = (byte) (this.checksum & 255);
+
+    }
+
+    public void setChecksum(byte[] checksum){
+        this.checksum = ByteBuffer.wrap(checksum).getInt();
+        setChecksum(this.checksum);
+    }
+
+
     public void setConnectionNum(int connectionNum){
         this.connectionNum = connectionNum;
         header[9] = (byte) ((this.connectionNum >> 8) & 0xff);
@@ -119,6 +131,10 @@ public class LTPHeader {
 
     public int getSeqNum(){
         return seqNum;
+    }
+
+    public int getChecksum(){
+        return checksum;
     }
 
     public boolean getSynFlag(){
