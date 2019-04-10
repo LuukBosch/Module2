@@ -1,6 +1,8 @@
 package LTP;
 
 import Packet.Packet;
+import com.nedap.university.IOHandler;
+import nasprotocol.NasProtocolHandler;
 
 
 import java.net.DatagramPacket;
@@ -8,35 +10,34 @@ import java.net.InetAddress;
 import java.util.Arrays;
 
 public class LTPConnection {
-    private LTPHandler ltpHandler;
-    private PacketBuilder packetBuilder;
+    private IOHandler ioHandler;
+    private PacketBuilder packetBuilder;//Static?
     private InetAddress address;
     private int port;
     private int connectionNum;
-    private boolean sending = false;
-    private boolean receiving = false;
-    public boolean fileToRequest;
-    public String desiredFile;
+    private NasProtocolHandler nasProtocolHandler;
+    public boolean connected = false;
 
 
-    public LTPConnection(LTPHandler ltpHandler, InetAddress address, int port){
+
+
+
+    public LTPConnection(NasProtocolHandler nasProtocolHandler, IOHandler ioHandler, int connectionNum, InetAddress address, int port){
         this.address = address;
         this.port = port;
-        this.ltpHandler = ltpHandler;
+        this.ioHandler = ioHandler;
+        this.connectionNum = connectionNum;
+        this.nasProtocolHandler = nasProtocolHandler;
         this.packetBuilder = new PacketBuilder();
     }
 
     public void handleMessage(Packet input){
         if(input.getHeader().getSynFlag() && !input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){       //SYN Message
-            connectionNum = input.getHeader().getConnectionNum();
             sendSynAck(input);
         } else if(input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){ //SYN/ack Message
-            System.out.println(fileToRequest);
-            if(fileToRequest){
-               sendFileRequest(input);
-            }
+            nasProtocolHandler.connected(address, port);
         } else if(!input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()) { //ACK message
-            handleAckMessage(input);
+            //handleAckMessage(input);
         } else if(!input.getHeader().getSynFlag() && !input.getHeader().getAckFlag() && input.getHeader().getFinFlag()){ //FinMessage
 
         } else{
@@ -44,45 +45,20 @@ public class LTPConnection {
         }
     }
 
-    public void handleAckMessage(Packet input){
-        if("GET/".equals(new String(Arrays.copyOfRange(input.getData(), 0, 4)))){
-            sending = true;
-
-
-        } else if("POST/".equals(new String(Arrays.copyOfRange(input.getData(), 0, 5)))){
-            receiving = true;
-
-        } else if(sending){
-
-        } else if(receiving){
-
-        }
-
-    }
-
-    public void getFile(String file){
-        fileToRequest = true;
-        desiredFile = file;
+    public void setupConnection(InetAddress address, int port){
         Packet syn = packetBuilder.getSynMessage();
         connectionNum = syn.getHeader().getConnectionNum();
         byte[] synMessageBytes = syn.getPacket();
         DatagramPacket synDatagram = new DatagramPacket(synMessageBytes,synMessageBytes.length, address, port);
-        ltpHandler.getIoHandler().addToSendQueue(synDatagram);
+        ioHandler.addToSendQueue(synDatagram);
     }
 
-    public void sendFileRequest(Packet input){
-        fileToRequest = false;
-        Packet request = packetBuilder.getFileRequest(input, desiredFile);
-        byte[] requestMessageBytes = request.getPacket();
-        DatagramPacket requestDatagram = new DatagramPacket(requestMessageBytes,requestMessageBytes.length, address, port);
-        ltpHandler.getIoHandler().addToSendQueue(requestDatagram);
-    }
 
     public void sendSynAck(Packet input){
         Packet synAck = packetBuilder.getSynAckMessage(input);
         byte[] synAckMessageBytes = synAck.getPacket();
         DatagramPacket synAckDatagram = new DatagramPacket(synAckMessageBytes,synAckMessageBytes.length, address, port);
-        ltpHandler.getIoHandler().addToSendQueue(synAckDatagram);
+        ioHandler.addToSendQueue(synAckDatagram);
     }
 
     public int getConnectionNum(){

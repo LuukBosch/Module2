@@ -2,20 +2,30 @@ package LTP;
 
 import Packet.Packet;
 import com.nedap.university.IOHandler;
+import nasprotocol.NasProtocolHandler;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 public class LTPHandler {
     IOHandler ioHandler;
-    //LTPConnection ltpConnection;
     ArrayList<LTPConnection> connections = new ArrayList<>();
+    Random random = new Random();
+    NasProtocolHandler nasProtocolHandler;
 
-    public LTPHandler(IOHandler ioHandler){
-        this.ioHandler = ioHandler;
+    public LTPHandler(NasProtocolHandler nasProtocolHandler, String name, int port){
+        try {
+            this.nasProtocolHandler = nasProtocolHandler;
+            ioHandler = new IOHandler(this, name, port);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 
     public void directMessage(DatagramPacket input){
@@ -32,7 +42,7 @@ public class LTPHandler {
                 }
             }
             if (!connected) {
-                LTPConnection newConnection = new LTPConnection(this, input.getAddress(), input.getPort());
+                LTPConnection newConnection = new LTPConnection(nasProtocolHandler, ioHandler, inputPacket.getHeader().getConnectionNum(), input.getAddress(), input.getPort());
                 connections.add(newConnection);
                 newConnection.handleMessage(inputPacket);
 
@@ -42,23 +52,35 @@ public class LTPHandler {
         }
     }
 
-    public LTPConnection StartNewLTPConnection(InetAddress address, int port){
-        LTPConnection connection = new LTPConnection(this, address, port);
+    public void startConnection(NasProtocolHandler nasProtocolHandler, InetAddress address, int port){
+        int connectionNum = (random.nextInt() & 0xFFFF);
+        LTPConnection connection = new LTPConnection(nasProtocolHandler, ioHandler, connectionNum, address, port);
         connections.add(connection);
-        return connection;
+        connection.setupConnection(address, port);
+    }
+
+    public void sendBroadCast(int port, String message){
+        byte[] buffer = message.getBytes();
+        try {
+            DatagramPacket broadcast = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.16.1.255"), port);
+            ioHandler.addToSendQueue(broadcast);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void receivedBroadCast(InetAddress address, int port, String message){
+        nasProtocolHandler.receiveBroadCast(address, port, message);
     }
 
 
-    public IOHandler getIoHandler(){
-        return ioHandler;
-    }
 
     public boolean checkCorrupted(Packet input){
         int receivedChecksum = input.getHeader().getChecksum();
         input.getHeader().setChecksum(0);
         Checksum checksum = new CRC32();
         checksum.update(input.getPacket(), 0, input.getPacket().length);
-        int checksumValue = (int) (checksum.getValue()  &  4294967295l);
+        int checksumValue = (int) (checksum.getValue()  & 0xffffffffL);
         return (checksumValue == receivedChecksum);
     }
 

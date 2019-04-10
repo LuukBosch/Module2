@@ -30,6 +30,8 @@ public class Tryanderror {
             int c = 4;
 
 
+
+
             System.out.println("CRC32 checksum for input string is: " + Integer.toBinaryString( -1884803971));
             System.out.println("CRC32 checksum for input string is: " + Long.toBinaryString(num3));
             System.out.println("CRC32 checksum for input string is: " + Long.toBinaryString(num4));

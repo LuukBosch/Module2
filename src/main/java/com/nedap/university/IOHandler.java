@@ -1,6 +1,8 @@
 package com.nedap.university;
 
 
+import LTP.LTPHandler;
+
 import java.io.IOException;
 import java.net.*;
 
@@ -17,16 +19,31 @@ public class IOHandler {
     private String name;
     private DatagramSocket socket;
     private InputHandler inputHandler;
+    private LTPHandler ltpHandler;
+    private boolean stopped = false;
 
     private Queue<DatagramPacket> sendQueue = new LinkedList<>();
 
     //TODO autocloseable
-    public IOHandler(int port, String name) throws SocketException {
+    public IOHandler(LTPHandler ltpHandler, String name, int port) throws SocketException {
+        this.ltpHandler = ltpHandler;
         socket = new DatagramSocket(port);
         socket.setBroadcast(true);
         socket.setSoTimeout(TIMEOUT);
-        inputHandler = new InputHandler(this);
+        inputHandler = new InputHandler(this, ltpHandler);
         this.name = name;
+    }
+
+    public void startSendingreceive(){
+        while(!stopped) {
+            try {
+                this.receive();
+                this.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void send() throws IOException {
@@ -59,7 +76,10 @@ public class IOHandler {
         return inputHandler;
     }
 
-    public InetAddress getFirstNonLoopbackAddress() throws SocketException {
+    public void stop(){
+        stopped = true;
+    }
+    public static InetAddress getFirstNonLoopbackAddress() throws SocketException {
         Enumeration en = NetworkInterface.getNetworkInterfaces();
         while (en.hasMoreElements()) {
             NetworkInterface i = (NetworkInterface) en.nextElement();
@@ -74,10 +94,6 @@ public class IOHandler {
         }
         return null;
     }
-
-
-
-
 
 
 }

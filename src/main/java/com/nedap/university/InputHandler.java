@@ -19,10 +19,10 @@ public class InputHandler {
 
 
 
-    public InputHandler(IOHandler ioHandler){
+    public InputHandler(IOHandler ioHandler, LTPHandler ltpHandler){
         this.ioHandler = ioHandler;
         serverInfo = new ServerInfo();
-        ltpHandler = new LTPHandler(this.ioHandler);
+        this.ltpHandler = ltpHandler;
     }
 
     public void handleInput(DatagramPacket input) throws UnknownHostException, SocketException {
