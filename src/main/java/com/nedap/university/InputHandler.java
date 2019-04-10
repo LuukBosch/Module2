@@ -2,7 +2,9 @@ package com.nedap.university;
 
 
 import Data.DataHandler;
-import client.ConnectionHandler;
+import LTP.LTPConnection;
+import LTP.LTPHandler;
+import Packet.Packet;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -12,13 +14,15 @@ import java.util.Arrays;
 
 public class InputHandler {
     private IOHandler ioHandler;
-    private ConnectionInfo connectionInfo;
+    private ServerInfo serverInfo;
+    private LTPHandler ltpHandler;
 
 
 
     public InputHandler(IOHandler ioHandler){
         this.ioHandler = ioHandler;
-        connectionInfo = new ConnectionInfo();
+        serverInfo = new ServerInfo();
+        ltpHandler = new LTPHandler(this.ioHandler);
     }
 
     public void handleInput(DatagramPacket input) throws UnknownHostException, SocketException {
@@ -28,11 +32,12 @@ public class InputHandler {
             sendName(input.getAddress(), input.getPort());
             sendFileList(input.getAddress(), input.getPort());
         } else if("LPD/".equals(new String(Arrays.copyOfRange(data, 0, 4)))){
-            storeServer(input.getAddress(), data);
+            storeServer(input.getAddress(), input.getPort(), data);
         } else if(("LPSF/".equals(new String(Arrays.copyOfRange(data, 0, 5))))){
             addfileList(input.getAddress(), data);
-        } //TODO LTPHEADER
-
+        } else{
+            ltpHandler.directMessage(input);//TODO not direct everything. apply filter.
+        }
     }
 
     public void sendName(InetAddress address, int port){
@@ -41,10 +46,11 @@ public class InputHandler {
         ioHandler.addToSendQueue(message);
     }
 
-    public void storeServer(InetAddress address, byte[] data) throws UnknownHostException {
+    public void storeServer(InetAddress address, int port, byte[] data) throws UnknownHostException {
         if(!address.equals(InetAddress.getLocalHost())) {
-            connectionInfo.setServerName(new String(Arrays.copyOfRange(data, 4, data.length)));
-            connectionInfo.setAddress(address);
+            serverInfo.setServerName(new String(Arrays.copyOfRange(data, 4, data.length)));
+            serverInfo.setAddress(address);
+            serverInfo.setPort(port);
         }
     }
 
@@ -55,15 +61,17 @@ public class InputHandler {
     }
 
     public void addfileList(InetAddress address, byte[] data) throws UnknownHostException, SocketException {
-        System.out.println("Received files from:  " + address.toString());
         if(!address.equals(ioHandler.getFirstNonLoopbackAddress())){
-            System.out.println("stored");
-            connectionInfo.addFile(new String(data).replaceFirst("LPSF/", ""));//TODO specify server;
+            serverInfo.addFile(new String(data).replaceFirst("LPSF/", ""));//TODO specify server;
         }
     }
 
-    public ConnectionInfo getConnectionInfo(){
-        return connectionInfo;
+    public ServerInfo getServerInfo(){
+        return serverInfo;
+    }
+
+    public LTPHandler getLTPHandler(){
+        return ltpHandler;
     }
 
 

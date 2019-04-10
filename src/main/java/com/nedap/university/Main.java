@@ -1,6 +1,5 @@
 package com.nedap.university;
 
-import Data.DataHandler;
 import TUI.TUI;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class Main {
         this.name = name;
         try {
             ioHandler = new IOHandler(port, name);
-            tui = new TUI(this, ioHandler.getInputHandler().getConnectionInfo());
+            tui = new TUI(this, ioHandler.getInputHandler().getServerInfo());
         } catch (SocketException e) {
             e.printStackTrace();
         }

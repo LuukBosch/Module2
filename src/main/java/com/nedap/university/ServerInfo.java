@@ -5,26 +5,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class ConnectionInfo {
-    private boolean isConnected;
+public class ServerInfo {
     private String serverName;
     private ArrayList<String> files;
     private InetAddress address;
+    private int port;
 
-    public ConnectionInfo(){
-        isConnected = false;
-        serverName = "Computer";
-        try {
-            InetAddress address = InetAddress.getByName("172.16.1.12");
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+    public ServerInfo(){
         files = new ArrayList<>();
     }
 
-    public boolean isConnected(){
-        return isConnected;
-    }
 
     public String getServerName(){
         return serverName;
@@ -35,8 +25,6 @@ public class ConnectionInfo {
     }
 
     public void addFile(String file){
-
-
         String[] data = file.split(" ");
         for(int i = 0; i < data.length; i++){
             files.add(data[i]);
@@ -48,7 +36,19 @@ public class ConnectionInfo {
 
     }
 
+    public void setPort(int port){
+        this.port = port;
+    }
+
     public void setAddress(InetAddress address){
         this.address = address;
+    }
+
+    public InetAddress getAddress(){
+        return address;
+    }
+
+    public int getPort(){
+        return port;
     }
 }

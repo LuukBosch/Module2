@@ -11,15 +11,14 @@ public class Packet {
     }
 
     public Packet(byte[] packet){
-        header = new LTPHeader(Arrays.copyOfRange(packet, 0, 9));
+        header = new LTPHeader(Arrays.copyOfRange(packet, 0, 11));
         if(packet.length > LTPHeader.SIZE) {
-            data = Arrays.copyOfRange(packet, 9, packet.length);
+            data = Arrays.copyOfRange(packet, 11, packet.length);
         }
     }
 
 
     public void addData(byte[] data){
-        this.data = new byte[data.length];
         this.data = data;
     }
 
@@ -32,7 +31,7 @@ public class Packet {
         if(data != null) {
             int len_data = data.length;
             byte[] packet = new byte[len_header + len_data];
-            System.arraycopy(header, 0, packet, 0, len_header);
+            System.arraycopy(header.getHeader(), 0, packet, 0, len_header);
             System.arraycopy(data, 0, packet, len_header, len_data);
             insertChecksum();
             return packet;

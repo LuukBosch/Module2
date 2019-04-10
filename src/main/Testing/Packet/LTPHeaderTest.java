@@ -15,21 +15,16 @@ public class LTPHeaderTest {
     @Before
     public void Setup(){
         header = new LTPHeader();
-        byte[] byteheader = new byte[9];
+        byte[] byteheader = new byte[11];
         byteheader[3] = 100;
         byteheader[7] = 100;
         byteheader[8] = 3;
+        byteheader[9] = 15;
+        byteheader[10] = 15;
         header2 = new LTPHeader(byteheader);
 
     }
 
-    @Test
-    public void setFlag() {
-    }
-
-    @Test
-    public void setFlags() {
-    }
 
     @Test
     public void setFinFlag() {
@@ -77,6 +72,21 @@ public class LTPHeaderTest {
     }
 
     @Test
+    public void setConnectionNum(){
+        header.setConnectionNum(100);
+        assertEquals(100, header.getConnectionNum());
+    }
+    @Test
+    public void setConnectionNum2(){
+        byte[] temp = new byte[2];
+        temp[1] = 100;
+        header.setConnectionNum(temp);
+        assertEquals(100, header.getConnectionNum());
+
+
+    }
+
+    @Test
     public void getFlags() {
         header.setFinFlag();
         header.setAckFlag();
@@ -86,16 +96,22 @@ public class LTPHeaderTest {
 
     @Test
     public void getHeader() {
-        byte[] byteheader = new byte[9];
+        byte[] byteheader = new byte[11];
         byteheader[3] = 100;
         byteheader[7] = 100;
         byteheader[8] = 3;
+        byteheader[9] = 15;
+        byteheader[10] = 15;
         header.setSynFlag();
         header.setAckFlag();
         header.setAckNum(100);
         header.setSeqNum(100);
+        header.setConnectionNum(3855);
         assertArrayEquals(byteheader, header.getHeader());
         assertArrayEquals(byteheader, header2.getHeader());
+        assertTrue(header2.getAckFlag());
+        assertTrue(header2.getSynFlag());
+        assertFalse(header2.getFinFlag());
     }
 
 

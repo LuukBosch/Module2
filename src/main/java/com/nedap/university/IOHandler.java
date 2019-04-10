@@ -40,7 +40,9 @@ public class IOHandler {
         DatagramPacket receivedDatagram = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(receivedDatagram);
-            inputHandler.handleInput(receivedDatagram);
+            if(!receivedDatagram.getAddress().equals(getFirstNonLoopbackAddress())) {
+                inputHandler.handleInput(receivedDatagram);
+            }
         } catch(SocketTimeoutException e){
         }
     }

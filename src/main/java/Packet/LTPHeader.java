@@ -6,23 +6,24 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 public class LTPHeader {
-    public static final int SIZE = 9;
-    private static final int NUMS_BITS = 32;
-    private byte[] header = new byte[9];
+    public static final int SIZE =11;
+    private byte[] header = new byte[11];
     private int seqNum;
     private int ackNum;
-    private BitSet flags;
+    private int connectionNum;
+    private BitSet flags = new BitSet(3);
 
     public LTPHeader() {
-        flags = new BitSet(3);
-        this.seqNum = (int) (Math.random() * (Math.pow(2, NUMS_BITS) + 1));
+        this.seqNum = 0;
         this.ackNum = 0;
+        this.connectionNum = 0;
     }
 
     public LTPHeader(byte[] header){
         setSeqNum(Arrays.copyOfRange(header, 0, 4));
         setAckNum(Arrays.copyOfRange(header, 4, 8));
         setFlags(header[8]);
+        setConnectionNum(Arrays.copyOfRange(header, 9, 11));
     }
 
     //---------------------Setters--------------------------------
@@ -37,8 +38,19 @@ public class LTPHeader {
         header[8] = flags.toByteArray()[0];
     }
 
-    public void setFlags(byte flags){
-        header[8] = flags;
+    public void setFlags(byte flag){
+        if((((int)flag >> 0) & 1) == 1){
+            flags.set(0);
+        }
+        if((((int)flag >> 1) & 1) == 1){
+            flags.set(1);
+        }
+        if((((int)flag >> 2) & 1) == 1){
+            flags.set(2);
+        }
+
+        header[8] = flag;
+
     }
 
     public void setFinFlag() {
@@ -81,6 +93,17 @@ public class LTPHeader {
         header[3] = (byte) (this.seqNum & 255);
     }
 
+    public void setConnectionNum(int connectionNum){
+        this.connectionNum = connectionNum;
+        header[9] = (byte) ((this.connectionNum >> 8) & 0xff);
+        header[10] = (byte) (this.connectionNum & 0xff);
+    }
+
+    public void setConnectionNum(byte[] connectionNum){
+        this.connectionNum = ((connectionNum[0] & 0xff) << 8) | (connectionNum[1] & 0xff);
+        setConnectionNum(this.connectionNum);
+    }
+
 
     //---------------------Getters--------------------------------
     public BitSet getFlags() {
@@ -111,6 +134,13 @@ public class LTPHeader {
     public boolean getFinFlag(){
         return flags.get(2);
     }
+
+    public int getConnectionNum(){
+        return connectionNum;
+    }
+
+
+
 
 
 
