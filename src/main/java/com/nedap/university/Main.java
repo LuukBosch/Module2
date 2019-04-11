@@ -1,6 +1,7 @@
 package com.nedap.university;
 
 import TUI.TUI;
+import application.Application;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -15,29 +16,14 @@ public class Main {
     private static final String broadcastMessage = "hello";
     private TUI tui;
 
-    public Main(int port, String name) {
-
-    }
-
-
 
     public static void main(String[] args) throws IOException {
-        Main main = new Main(8888, "computer");
-        main.broadcastHello();
-        main.tui.start();
-        while(!main.exit){
-
-        }
+        Application test = new Application("test", 8888);
+        TUI tui = new TUI(test);
+        tui.start();
 
     }
 
-    public void broadcastHello() throws UnknownHostException {
-
-    }
-
-    public IOHandler getIoHandler(){
-        return ioHandler;
-    }
 }
 
 

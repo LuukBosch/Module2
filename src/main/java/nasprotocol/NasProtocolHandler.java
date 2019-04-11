@@ -50,7 +50,7 @@ public class NasProtocolHandler {
         ltpHandler.sendBroadCast(port, message);
     }
 
-    public void receiveBroadCast(InetAddress address, int port, String message){
+    public void receiveBroadCast(InetAddress address, int port, byte[] message){
         application.receiveBroadcast(address, port, message);
     }
 

@@ -1,20 +1,20 @@
 package TUI;
 
 import LTP.LTPConnection;
+import application.Application;
+import application.NasServer;
 import com.nedap.university.ServerInfo;
 import com.nedap.university.Main;
 
 import java.util.Scanner;
 
 public class TUI extends Thread {
-    private ServerInfo serverInfo;
-    private Scanner in;
-    private Main main;
-    private static final int EXIT = 4;
+    private Application application;
+    private static int EXIT = 4;
 
-    public TUI(Main main, ServerInfo serverInfo){
-        this.main = main;
-        this.serverInfo = serverInfo;
+
+    public TUI(Application application){
+        this.application = application;
     }
 
 
@@ -36,7 +36,7 @@ public class TUI extends Thread {
         System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
         System.out.println("▐  Available servers.................1 ▍");
         System.out.println("▐  Available files...................2 ▍");
-        System.out.println("▐  Get File..........................3 ▍");
+        System.out.println("▐  Start connection..................3 ▍");
         System.out.println("▐  Exit..............................4 ▍");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
     }
@@ -79,17 +79,40 @@ public class TUI extends Thread {
 
     public void executeChoice(int choice){
         if(choice == 1){
-            System.out.println("Available servers are:");
-            System.out.println(main.getIoHandler().getInputHandler().getServerInfo().getServerName());
+            displayServers();
         } else if(choice == 2){
-            System.out.println("Available files at server are:");
-            System.out.println(main.getIoHandler().getInputHandler().getServerInfo().getFiles());
+            displayfiles();
+
         } else if(choice == 3){
-            LTPConnection connection = main.getIoHandler().getInputHandler().getLTPHandler().StartNewLTPConnection
-                    (main.getIoHandler().getInputHandler().getServerInfo().getAddress(), main.getIoHandler().getInputHandler().getServerInfo().getPort() );
-            String input = readStringWithPrompt("What file do you want?");
-            connection.getFile(input);
+            startconnection();
+
         }
+    }
+
+    public void displayServers(){
+        int count = 1;
+        for(NasServer server: application.getAvailableServers()){
+            System.out.print(count + ".   " + server.getName());
+            if(application.getConnections().contains(server)){
+                System.out.println("  ✅");
+            }
+
+            count++;
+        }
+    }
+
+    public void displayfiles(){
+        int count = 1;
+        if(!application.getAvailableServers().isEmpty()) {
+            for (String file : application.getAvailableServers().get(0).getFiles()) {
+                System.out.println(count + ".   " + file);
+            }
+        }
+    }
+
+    public void startconnection(){
+        application.connect(application.getAvailableServers().get(0).getAddress(), application.getAvailableServers().get(0).getPort());
+
     }
 
 

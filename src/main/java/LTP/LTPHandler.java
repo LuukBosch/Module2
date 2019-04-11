@@ -69,7 +69,7 @@ public class LTPHandler {
         }
     }
 
-    public void receivedBroadCast(InetAddress address, int port, String message){
+    public void receivedBroadCast(InetAddress address, int port, byte[] message){
         nasProtocolHandler.receiveBroadCast(address, port, message);
     }
 

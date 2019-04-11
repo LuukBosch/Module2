@@ -39,6 +39,9 @@ public class Tryanderror {
             System.out.println("CRC32 checksum after mod string is: " + Long.toBinaryString(num3 &  4294967295l));
             System.out.println("CRC32 checksum after mod string is: " + (num4 &  4294967295l));
 
+            byte[] hello = "hello".getBytes();
+            System.out.println(hello.equals("hello"));
+
         }
     }
 

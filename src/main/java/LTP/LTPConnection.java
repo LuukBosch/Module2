@@ -35,7 +35,8 @@ public class LTPConnection {
         if(input.getHeader().getSynFlag() && !input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){       //SYN Message
             sendSynAck(input);
         } else if(input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()){ //SYN/ack Message
-            nasProtocolHandler.connected(address, port);
+            
+            //nasProtocolHandler.connected(address, port);
         } else if(!input.getHeader().getSynFlag() && input.getHeader().getAckFlag() && !input.getHeader().getFinFlag()) { //ACK message
             //handleAckMessage(input);
         } else if(!input.getHeader().getSynFlag() && !input.getHeader().getAckFlag() && input.getHeader().getFinFlag()){ //FinMessage

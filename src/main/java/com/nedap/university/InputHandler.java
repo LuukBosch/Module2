@@ -28,13 +28,8 @@ public class InputHandler {
     public void handleInput(DatagramPacket input) throws UnknownHostException, SocketException {
         byte[] data = new byte[input.getLength()];
         System.arraycopy(input.getData(), input.getOffset(), data, 0, input.getLength());
-        if("hello".equals(new String(data))){
-            sendName(input.getAddress(), input.getPort());
-            sendFileList(input.getAddress(), input.getPort());
-        } else if("LPD/".equals(new String(Arrays.copyOfRange(data, 0, 4)))){
-            storeServer(input.getAddress(), input.getPort(), data);
-        } else if(("LPSF/".equals(new String(Arrays.copyOfRange(data, 0, 5))))){
-            addfileList(input.getAddress(), data);
+        if("hello".equals(new String(data)) || "LDP/".equals(new String(Arrays.copyOfRange(data, 0, 4)))){
+            ltpHandler.receivedBroadCast(input.getAddress(), input.getPort(), data);
         } else{
             ltpHandler.directMessage(input);//TODO not direct everything. apply filter.
         }
