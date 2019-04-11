@@ -1,16 +1,13 @@
 package TUI;
 
-import LTP.LTPConnection;
 import application.Application;
 import application.NasServer;
-import com.nedap.university.ServerInfo;
-import com.nedap.university.Main;
 
 import java.util.Scanner;
 
 public class TUI extends Thread {
     private Application application;
-    private static int EXIT = 4;
+    private static int EXIT = 5;
 
 
     public TUI(Application application){
@@ -37,7 +34,8 @@ public class TUI extends Thread {
         System.out.println("▐  Available servers.................1 ▍");
         System.out.println("▐  Available files...................2 ▍");
         System.out.println("▐  Start connection..................3 ▍");
-        System.out.println("▐  Exit..............................4 ▍");
+        System.out.println("▐  Get File..........................4 ▍");
+        System.out.println("▐  Exit..............................5 ▍");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
     }
 
@@ -82,10 +80,11 @@ public class TUI extends Thread {
             displayServers();
         } else if(choice == 2){
             displayfiles();
-
         } else if(choice == 3){
             startconnection();
-
+        } else if(choice == 4){
+            String file = readStringWithPrompt("what file do you want?");
+            getFile(file);
         }
     }
 
@@ -112,6 +111,11 @@ public class TUI extends Thread {
 
     public void startconnection(){
         application.connect(application.getAvailableServers().get(0).getAddress(), application.getAvailableServers().get(0).getPort());
+
+    }
+
+    public void getFile(String file){
+        application.getFile(file, application.getAvailableServers().get(0));
 
     }
 

@@ -1,14 +1,10 @@
 package application;
 
 import Data.DataHandler;
-import com.nedap.university.IOHandler;
 import nasprotocol.NasProtocolHandler;
-
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+
 
 public class Application {
     private String name;
@@ -32,8 +28,8 @@ public class Application {
         nasProtocol.setupConnection(address, port);
     }
 
-    public void getFile(String file){
-        //nasProtocol.getRequest(file);
+    public void getFile(String file ,NasServer server){
+        nasProtocol.getRequest(server.getAddress(), server.getPort(), file);
     }
 
     public void postFile(String file){
@@ -47,7 +43,18 @@ public class Application {
 
     public void resumeDownload(String file){
         //nasProtocol.resumeRequest(file);
+    }
 
+    public void receiveGet(InetAddress address, int port, String getRequest){
+        if(dataHandler.hasFile(getRequest)){
+            nasProtocol.send(address, port, dataHandler.getFile(getRequest));
+        } else{
+
+        }
+    }
+
+    public void receivePost(InetAddress address, int port, String getRequest){
+        // start download procedure
     }
 
     public void connected(InetAddress address, int port){

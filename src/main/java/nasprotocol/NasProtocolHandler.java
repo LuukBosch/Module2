@@ -3,7 +3,9 @@ package nasprotocol;
 import LTP.LTPHandler;
 import application.Application;
 
+import java.io.File;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 public class NasProtocolHandler {
     private LTPHandler ltpHandler;
@@ -14,8 +16,8 @@ public class NasProtocolHandler {
         ltpHandler = new LTPHandler(this, name, port);
     }
 
-    public void getFile(String file){
-        //ltpHandler.send("GET/" + file);
+    public void getRequest(InetAddress address, int port, String file){
+        ltpHandler.send(address, port, "GET/" + file);
     }
 
 
@@ -34,8 +36,22 @@ public class NasProtocolHandler {
         //ltpHandler.send("RESUME/" + file);
     }
 
-    public void receive(String file, byte[] data){
-        application.receiveMessage(file, data);
+    public void send(InetAddress address, int port, File file){
+        LTPHandler.send(address, port, file);
+
+    }
+
+    public void receive(InetAddress address, int port, byte[] data){
+        String[] splitMessage = (new String(data).split("/"));  //TODO split byte array on /?
+        if("GET/".equals(new String(Arrays.copyOfRange(data, 0, 4)))){
+            application.receiveGet(address, port, splitMessage[1]);
+
+        } else if("POST/".equals(new String(Arrays.copyOfRange(data, 0, 5)))){
+            application.receivePost(address, port, splitMessage[1]);
+
+        } else{
+            //application.receiveMessage(address, port, splitMessage[0], splitMessage[1].getBytes());
+        }
     }
 
     public void setupConnection(InetAddress address, int port){

@@ -2,6 +2,7 @@ package com.nedap.university;
 
 
 import LTP.LTPHandler;
+import Packet.Packet;
 
 import java.io.IOException;
 import java.net.*;

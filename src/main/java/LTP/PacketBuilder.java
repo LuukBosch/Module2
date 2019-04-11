@@ -35,16 +35,25 @@ public class PacketBuilder {
         return synAckMessage;
     }
 
-    public Packet getFileRequest(Packet input, String file){
-        Packet request = new Packet();
-        request.getHeader().setAckNum(input.getHeader().getSeqNum() + 1);
-        request.getHeader().setAckFlag();
-        request.getHeader().setConnectionNum(input.getHeader().getConnectionNum());
-        String payload = "GET/"+file;
-        request.addData(payload.getBytes());
-        request.getHeader().setSeqNum(input.getHeader().getAckNum() + payload.length());
-        request.setChecksum();
-        return request;
+    public Packet getAckMessage(Packet input){
+        Packet ackMessage = new Packet();
+        ackMessage.getHeader().setAckNum(input.getHeader().getSeqNum() + 1);
+        ackMessage.getHeader().setSeqNum(input.getHeader().getAckNum());
+        ackMessage.getHeader().setAckFlag();
+        ackMessage.getHeader().setConnectionNum(input.getHeader().getConnectionNum());
+        ackMessage.setChecksum();
+        return ackMessage;
+    }
+
+    public Packet dataPacket(String data, int seq, int ack, int connectionNum){
+        Packet dataMessage = new Packet();
+        dataMessage.getHeader().setAckNum(ack);
+        dataMessage.getHeader().setSeqNum(seq);
+        dataMessage.getHeader().setConnectionNum(connectionNum);
+        dataMessage.getHeader().setAckFlag();
+        dataMessage.addData(data.getBytes());
+        dataMessage.setChecksum();
+        return dataMessage;
     }
 
 

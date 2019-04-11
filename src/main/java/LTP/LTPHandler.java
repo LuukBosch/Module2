@@ -33,6 +33,7 @@ public class LTPHandler {
         byte[] data = new byte[input.getLength()];
         System.arraycopy(input.getData(), input.getOffset(), data, 0, input.getLength());
         Packet inputPacket = new Packet(data);
+        System.out.println(new String(data));
         if(checkCorrupted(inputPacket)) {
             for (LTPConnection connection : connections) {
                 if (connection.getConnectionNum() == inputPacket.getHeader().getConnectionNum()) {
@@ -41,14 +42,33 @@ public class LTPHandler {
                     break;
                 }
             }
-            if (!connected) {
+            if (!connected && inputPacket.getHeader().getSynFlag()) {
+                System.out.println("new connection!");
                 LTPConnection newConnection = new LTPConnection(nasProtocolHandler, ioHandler, inputPacket.getHeader().getConnectionNum(), input.getAddress(), input.getPort());
                 connections.add(newConnection);
                 newConnection.handleMessage(inputPacket);
-
             }
         } else{
             System.out.println("dropped!");
+        }
+    }
+
+    public LTPConnection getConnection(InetAddress address, int port){
+        for(LTPConnection connection: connections){
+            if(connection.getAddress().equals(address) && connection.getPort() == port){
+                return connection;
+            }
+        }
+        return null;
+    }
+
+    public void send(InetAddress address, int port, String data){
+        LTPConnection connection = getConnection(address, port);
+        if(connection != null){
+            connection.send(data);
+        } else{
+            //Error message
+            System.out.println("No connection");
         }
     }
 
@@ -72,7 +92,6 @@ public class LTPHandler {
     public void receivedBroadCast(InetAddress address, int port, byte[] message){
         nasProtocolHandler.receiveBroadCast(address, port, message);
     }
-
 
 
     public boolean checkCorrupted(Packet input){

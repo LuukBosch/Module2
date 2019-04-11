@@ -14,14 +14,12 @@ import java.util.Arrays;
 
 public class InputHandler {
     private IOHandler ioHandler;
-    private ServerInfo serverInfo;
     private LTPHandler ltpHandler;
 
 
 
     public InputHandler(IOHandler ioHandler, LTPHandler ltpHandler){
         this.ioHandler = ioHandler;
-        serverInfo = new ServerInfo();
         this.ltpHandler = ltpHandler;
     }
 
@@ -33,40 +31,6 @@ public class InputHandler {
         } else{
             ltpHandler.directMessage(input);//TODO not direct everything. apply filter.
         }
-    }
-
-    public void sendName(InetAddress address, int port){
-        byte[] hello = ("LPD/" + ioHandler.getName()).getBytes();
-        DatagramPacket message = new DatagramPacket(hello, hello.length, address, port);
-        ioHandler.addToSendQueue(message);
-    }
-
-    public void storeServer(InetAddress address, int port, byte[] data) throws UnknownHostException {
-        if(!address.equals(InetAddress.getLocalHost())) {
-            serverInfo.setServerName(new String(Arrays.copyOfRange(data, 4, data.length)));
-            serverInfo.setAddress(address);
-            serverInfo.setPort(port);
-        }
-    }
-
-    public void sendFileList(InetAddress address, int port){
-        byte[] file = ("LPSF/" + DataHandler.getFileList()).getBytes();
-        DatagramPacket files = new DatagramPacket(file, file.length, address, port);
-        ioHandler.addToSendQueue(files);
-    }
-
-    public void addfileList(InetAddress address, byte[] data) throws UnknownHostException, SocketException {
-        if(!address.equals(ioHandler.getFirstNonLoopbackAddress())){
-            serverInfo.addFile(new String(data).replaceFirst("LPSF/", ""));//TODO specify server;
-        }
-    }
-
-    public ServerInfo getServerInfo(){
-        return serverInfo;
-    }
-
-    public LTPHandler getLTPHandler(){
-        return ltpHandler;
     }
 
 
