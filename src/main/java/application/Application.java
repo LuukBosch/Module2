@@ -2,8 +2,11 @@ package application;
 
 import Data.DataHandler;
 import nasprotocol.NasProtocolHandler;
+
+import java.io.*;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Application {
@@ -13,15 +16,16 @@ public class Application {
     private DataHandler dataHandler;
     private ArrayList<NasServer> connections = new ArrayList<>();
     private ArrayList<NasServer> availableServers = new ArrayList<>();
-
+    private HashMap<String, BufferedOutputStream> readers;
 
 
     public Application(String name, int port){
         this.name = name;
         this.port = port;
         nasProtocol = new NasProtocolHandler(this, name, port);
-        sendBroadcast(8888, "hello");
+        sendBroadcast(port, "hello");
         dataHandler = new DataHandler();
+        readers = new HashMap<>();
     }
 
     public void connect(InetAddress address, int port){
@@ -29,7 +33,17 @@ public class Application {
     }
 
     public void getFile(String file ,NasServer server){
-        nasProtocol.getRequest(server.getAddress(), server.getPort(), file);
+        FileOutputStream fout = null;
+        try {
+            fout = new FileOutputStream(System.getProperty("user.home") + "/files/" + file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        BufferedOutputStream bout = new BufferedOutputStream(fout);
+        readers.put(file, bout);
+        nasProtocol.getRequest(file);
+
+
     }
 
     public void postFile(String file){
@@ -45,15 +59,22 @@ public class Application {
         //nasProtocol.resumeRequest(file);
     }
 
-    public void receiveGet(InetAddress address, int port, String getRequest){
+    public void receiveGet(String getRequest){
         if(dataHandler.hasFile(getRequest)){
-            nasProtocol.send(address, port, dataHandler.getFile(getRequest));
+            try {
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(dataHandler.getFile(getRequest).getAbsolutePath()));
+                System.out.println("bufferd made");
+                nasProtocol.send(bis, getRequest);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
         } else{
 
         }
     }
 
-    public void receivePost(InetAddress address, int port, String getRequest){
+    public void receivePost(String getRequest){
         // start download procedure
     }
 
@@ -63,6 +84,22 @@ public class Application {
     }
 
     public void receiveMessage(String file, byte[] packet){
+
+    }
+
+    public void receiveData(String file, byte[] data){
+        try {
+            if(new String(data).equals("LAST")){
+                System.out.println("last message!");
+                readers.get(file).close();
+            } else {
+                //System.out.println("writing data");
+                //System.out.println("size data" +data.length);
+                readers.get(file).write(data);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 

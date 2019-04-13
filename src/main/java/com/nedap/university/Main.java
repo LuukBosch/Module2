@@ -18,7 +18,7 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException {
-        Application test = new Application("test", 8888);
+        Application test = new Application("test", 6028);
         TUI tui = new TUI(test);
         tui.start();
 

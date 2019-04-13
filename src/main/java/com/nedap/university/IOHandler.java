@@ -1,7 +1,7 @@
 package com.nedap.university;
 
 
-import LTP.LTPHandler;
+import LTP.LTP;
 import Packet.Packet;
 
 import java.io.IOException;
@@ -9,52 +9,59 @@ import java.net.*;
 
 import java.util.*;
 
-import static java.net.InetAddress.getByName;
-
 
 public class IOHandler extends Thread{
-    private static final int TIMEOUT = 10;
+    private static final int TIMEOUT =300;
     private String name;
     private int port;
     private InputHandler inputHandler;
-    private LTPHandler ltpHandler;
-    private DatagramSocket socket;
+    private LTP ltp;
     private boolean stopped = false;
-    private Queue<DatagramPacket> sendQueue = new LinkedList<>();
+    //private Queue<Packet> sendQueue = new LinkedList<>();
+    private Queue<DatagramPacket> broadcastqueue = new LinkedList<>();
+    int count;
 
 
-    public IOHandler(LTPHandler ltpHandler, String name, int port) throws SocketException {
-        this.ltpHandler = ltpHandler;
+    public IOHandler(LTP ltp, String name, int port){
+        this.ltp = ltp;
         this.port = port;
-        socket = new DatagramSocket(port);
-        socket.setBroadcast(true);
-        socket.setSoTimeout(TIMEOUT);
-        inputHandler = new InputHandler(this, ltpHandler);
+        inputHandler = new InputHandler(this, ltp);
         this.name = name;
         this.start();
+        count = 0;
     }
 
     public void run(){
-        while(!stopped) {
-            try {
-                this.receive();
-                this.send();
+            try(DatagramSocket socket = new DatagramSocket(port)) {
+                while(!stopped) {
+                    socket.setBroadcast(true);
+                    socket.setSoTimeout(TIMEOUT);
+                    this.send(socket);
+                    this.receive(socket);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-
     }
 
-    public void send() throws IOException {
-        if(!sendQueue.isEmpty()) {
-            socket.send(sendQueue.remove());
+    public void send(DatagramSocket socket) throws IOException {
+        if(ltp.hasMessage()) {
+            Packet packet = ltp.getMessage();
+            DatagramPacket packetDatagram = new DatagramPacket(packet.getPacket(),
+                    packet.getPacket().length, ltp.getConnectedAddress(), ltp.getConnectedPort());
+            if(!(packet.getHeader().getAckFlag() && packet.getData().length == 0)) {
+                ltp.addToUnacked(packet);
+            }
+            //System.out.println("packet send!");
+            //packet.print();
+            socket.send(packetDatagram);
+        } else if(!ltp.getBroadcastQueue().isEmpty()){
+            socket.send(ltp.getBroadcastQueue().remove());
         }
     }
 
-    public void receive() throws IOException {
-        byte[] buffer = new byte[50];
+    public void receive(DatagramSocket socket) throws IOException {
+        byte[] buffer = new byte[1500];
         DatagramPacket receivedDatagram = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(receivedDatagram);
@@ -62,14 +69,9 @@ public class IOHandler extends Thread{
                 inputHandler.handleInput(receivedDatagram);
             }
         } catch(SocketTimeoutException e){
+            ltp.addRetransmission();
         }
     }
-
-
-    public void addToSendQueue(DatagramPacket packet){
-        sendQueue.add(packet);
-    }
-
 
 
 

@@ -6,16 +6,16 @@ import java.util.zip.Checksum;
 
 public class Packet {
     private LTPHeader header;
-    private byte[] data;
+    private byte[] data = new byte[0];
 
     public Packet(){
         header = new LTPHeader();
     }
 
     public Packet(byte[] packet){
-        header = new LTPHeader(Arrays.copyOfRange(packet, 0, 15));
+        header = new LTPHeader(Arrays.copyOfRange(packet, 0, 13));
         if(packet.length > LTPHeader.SIZE) {
-            data = Arrays.copyOfRange(packet, 15, packet.length);
+            data = Arrays.copyOfRange(packet, 13, packet.length);
         }
     }
 
@@ -56,6 +56,23 @@ public class Packet {
         // get the current checksum value
         long checksumValue = checksum.getValue();
         header.setChecksum(checksumValue);
+
+
+    }
+
+    public void print(){
+        System.out.println("seqNum:         " + getHeader().getSeqNum());
+        System.out.println("ackNum:         " + getHeader().getAckNum());
+        System.out.println("ack flag:       " + getHeader().getAckFlag());
+        System.out.println("syn flag:       " + getHeader().getSynFlag());
+        System.out.println("fin flag:       " + getHeader().getFinFlag());
+        //System.out.println("connection num: " + getHeader().getConnectionNum());
+        System.out.println("data lenght:    " + data.length);
+        System.out.println(" ");
+
+
+
+
 
 
     }

@@ -21,7 +21,6 @@ public class DataHandler {
     }
 
 
-
     public static String getFileList(){
         File folder = new File(PATH);
         System.getProperty("user.home");

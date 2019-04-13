@@ -6,26 +6,26 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 public class LTPHeader {
-    public static final int SIZE =15;
-    private byte[] header = new byte[15];
+    public static final int SIZE =13;
+    private byte[] header = new byte[13];
     private int seqNum;
     private int ackNum;
     private int checksum;
-    private int connectionNum;
+    //private int connectionNum;
     private BitSet flags = new BitSet(3);
 
     public LTPHeader() {
         this.seqNum = 0;
         this.ackNum = 0;
-        this.connectionNum = 0;
+        //this.connectionNum = 0;
     }
 
     public LTPHeader(byte[] header){
         setSeqNum(Arrays.copyOfRange(header, 0, 4));
         setAckNum(Arrays.copyOfRange(header, 4, 8));
         setFlags(header[8]);
-        setConnectionNum(Arrays.copyOfRange(header, 9, 11));
-        setChecksum(Arrays.copyOfRange(header, 11, 15));
+        //setConnectionNum(Arrays.copyOfRange(header, 9, 11));
+        setChecksum(Arrays.copyOfRange(header, 9, 13));
     }
 
     //---------------------Setters--------------------------------
@@ -92,10 +92,10 @@ public class LTPHeader {
 
     public void setChecksum(long checksum){
         this.checksum = (int) checksum;
-        header[11] = (byte) ((this.checksum & -16777216) >> 24);
-        header[12] = (byte) ((this.checksum & 16711680) >> 16);
-        header[13] = (byte) ((this.checksum & 65280) >> 8);
-        header[14] = (byte) (this.checksum & 255);
+        header[9] = (byte) ((this.checksum & -16777216) >> 24);
+        header[10] = (byte) ((this.checksum & 16711680) >> 16);
+        header[11] = (byte) ((this.checksum & 65280) >> 8);
+        header[12] = (byte) (this.checksum & 255);
 
     }
 
@@ -104,7 +104,7 @@ public class LTPHeader {
         setChecksum(this.checksum);
     }
 
-
+    /*
     public void setConnectionNum(int connectionNum){
         this.connectionNum = connectionNum;
         header[9] = (byte) ((this.connectionNum >> 8) & 0xff);
@@ -115,8 +115,7 @@ public class LTPHeader {
         this.connectionNum = ((connectionNum[0] & 0xff) << 8) | (connectionNum[1] & 0xff);
         setConnectionNum(this.connectionNum);
     }
-
-
+    */
     //---------------------Getters--------------------------------
     public BitSet getFlags() {
         return flags;
@@ -151,9 +150,11 @@ public class LTPHeader {
         return flags.get(2);
     }
 
+    /*
     public int getConnectionNum(){
         return connectionNum;
     }
+    */
 
 
 

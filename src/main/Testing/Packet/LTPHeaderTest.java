@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import Packet.LTPHeader;
 
 import static org.junit.Assert.*;
 
@@ -71,6 +72,7 @@ public class LTPHeaderTest {
         assertEquals(100, header.getSeqNum());
     }
 
+    /*
     @Test
     public void setConnectionNum(){
         header.setConnectionNum(100);
@@ -85,6 +87,7 @@ public class LTPHeaderTest {
 
 
     }
+    */
 
     @Test
     public void getFlags() {
@@ -106,7 +109,7 @@ public class LTPHeaderTest {
         header.setAckFlag();
         header.setAckNum(100);
         header.setSeqNum(100);
-        header.setConnectionNum(3855);
+        //header.setConnectionNum(3855);
         assertArrayEquals(byteheader, header.getHeader());
         assertArrayEquals(byteheader, header2.getHeader());
         assertTrue(header2.getAckFlag());
