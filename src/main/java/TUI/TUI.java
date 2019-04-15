@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class TUI extends Thread {
     private Application application;
-    private static int EXIT = 6;
+    private static int EXIT = 8;
 
 
     public TUI(Application application){
@@ -36,7 +36,9 @@ public class TUI extends Thread {
         System.out.println("▐  Start connection..................3 ▍");
         System.out.println("▐  Get File..........................4 ▍");
         System.out.println("▐  Post file.........................5 ▍");
-        System.out.println("▐  Exit..............................6 ▍");
+        System.out.println("▐  Pause download....................6 ▍");
+        System.out.println("▐  Resume download...................7 ▍");
+        System.out.println("▐  Exit..............................8 ▍");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
     }
 
@@ -89,6 +91,12 @@ public class TUI extends Thread {
         } else if(choice == 5){
             String file = readStringWithPrompt("what file do you want to post?");
             postFile(file);
+        } else if(choice == 6){
+            String file = readStringWithPrompt("which download do you want to pause?");
+            pauseDownload(file);
+        }else if(choice == 7){
+            String file = readStringWithPrompt("which download do you want to resume?");
+            resumeDownload(file);
         }
     }
 
@@ -116,7 +124,14 @@ public class TUI extends Thread {
 
     public void getFile(String file){
         application.getFile(file);
+    }
 
+    public void pauseDownload(String file){
+        application.pauseDownload(file);
+    }
+
+    public void resumeDownload(String file){
+        application.resumeDownload(file);
     }
 
     public void postFile(String file){

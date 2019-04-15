@@ -7,6 +7,9 @@ import java.io.*;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
+import java.util.zip.CheckedOutputStream;
 
 
 public class Application {
@@ -16,6 +19,8 @@ public class Application {
     private NasServer connectedNasServer;
     private ArrayList<NasServer> availableServers = new ArrayList<>();
     private HashMap<String, BufferedOutputStream> readers;
+    private HashMap<String, CheckedOutputStream> checkedoutputStreams = new HashMap<>();
+
     private boolean connected;
 
 
@@ -25,6 +30,7 @@ public class Application {
         sendBroadcast(port, "hello");
         dataHandler = new DataHandler();
         readers = new HashMap<>();
+
     }
 
     public void connect(InetAddress address, int port){
@@ -33,9 +39,10 @@ public class Application {
 
     public void getFile(String file) {
         if (connected) {
-            FileOutputStream fout = null;
+            CheckedOutputStream fout = null;
             try {
-                fout = new FileOutputStream(System.getProperty("user.home") + "/files/" + file);
+                fout = new CheckedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/files/" + file), new CRC32());
+                checkedoutputStreams.put(file, fout);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -47,29 +54,30 @@ public class Application {
 
     public void postFile(String file){
         try {
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(System.getProperty("user.home") + "/files/" + file));
-            nasProtocol.postFile(bis, file);
+            CheckedInputStream check = new CheckedInputStream(new FileInputStream(System.getProperty("user.home") + "/files/" + file), new CRC32());
+            BufferedInputStream bis = new BufferedInputStream(check);
+            nasProtocol.postFile(file, bis, check);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
     }
 
-    public void pauzeDownload(String file){
-        //nasProtocol.pauzeRequest(file);
+    public void pauseDownload(String file){
+        nasProtocol.pause(file);
 
     }
 
     public void resumeDownload(String file){
-        //nasProtocol.resumeRequest(file);
+        nasProtocol.resume(file);
     }
 
     public void receiveGet(String getRequest){
         if(dataHandler.hasFile(getRequest)){
             try {
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(dataHandler.getFile(getRequest).getAbsolutePath()));
-                System.out.println("bufferd made");
-                nasProtocol.send(bis, getRequest);
+                CheckedInputStream check = new CheckedInputStream(new FileInputStream(dataHandler.getFile(getRequest).getAbsolutePath()), new CRC32());
+                BufferedInputStream bis = new BufferedInputStream(check);
+                nasProtocol.send(getRequest, bis, check);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -83,9 +91,10 @@ public class Application {
 
     public void receivePost(String postRequest){
         try {
-            FileOutputStream fout = new FileOutputStream(System.getProperty("user.home") + "/files/" + postRequest);
+            CheckedOutputStream fout = new CheckedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/files/" + postRequest), new CRC32());
             BufferedOutputStream bout = new BufferedOutputStream(fout);
             readers.put(postRequest, bout);
+            checkedoutputStreams.put(postRequest, fout);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -102,12 +111,12 @@ public class Application {
 
     public void receiveData(String file, byte[] data){
         try {
-            if(new String(data).equals("LAST")){
+            if(new String(data).split("/")[0].equals("LAST")){
                 System.out.println("last message!");
                 readers.get(file).close();
+                System.out.println("received Checksum is:   " + new String(data).split("/")[1]);
+                System.out.println("calculated checksum is:    "  + checkedoutputStreams.get(file).getChecksum().getValue());
             } else {
-                //System.out.println("writing data");
-                //System.out.println("size data" +data.length);
                 readers.get(file).write(data);
             }
         } catch (IOException e) {

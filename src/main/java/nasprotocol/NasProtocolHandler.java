@@ -6,6 +6,7 @@ import application.Application;
 import java.io.BufferedInputStream;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.zip.CheckedInputStream;
 
 public class NasProtocolHandler {
     private LTP ltp;
@@ -21,23 +22,25 @@ public class NasProtocolHandler {
         ltp.getPacketBuffer().addToBuffer(("GET/" + file).getBytes());
     }
 
-    public void postFile( BufferedInputStream reader, String file) {
+    public void postFile(String file, BufferedInputStream reader, CheckedInputStream check) {
         ltp.getPacketBuffer().addToBuffer(("POST/" + file).getBytes());
-        ltp.getPacketBuffer().addFilestoSend(file, reader);
+        ltp.getPacketBuffer().addFilestoSend(file, reader, check);
     }
 
 
-    public void Pauze(String file){
-        //ltp.send("PAUZE/" + file);
+    public void pause(String file){
+        ltp.getPacketBuffer().addToBuffer(("PAUSE/" + file).getBytes());
+        ltp.getPacketBuffer().pauseStream(file);
     }
 
 
-    public void Resume(String file){
-        //ltp.send("RESUME/" + file);
+    public void resume(String file){
+        ltp.getPacketBuffer().addToBuffer(("RESUME/" + file).getBytes());
+        //ltp.getPacketBuffer().resumeStream(file);
     }
 
-    public void send(BufferedInputStream reader, String file){
-        ltp.getPacketBuffer().addFilestoSend(file, reader);
+    public void send(String file, BufferedInputStream reader, CheckedInputStream check){
+        ltp.getPacketBuffer().addFilestoSend(file, reader, check);
     }
 
     public void receive(byte[] data){
@@ -48,7 +51,13 @@ public class NasProtocolHandler {
         } else if("POST/".equals(new String(Arrays.copyOfRange(data, 0, 5)))){
             application.receivePost(splitMessage[1]);
 
-        } else{
+        } else if("PAUSE/".equals(new String(Arrays.copyOfRange(data, 0, 6)))) {
+            ltp.getPacketBuffer().pauseStream(splitMessage[1]);
+        } else if("RESUME/".equals(new String(Arrays.copyOfRange(data, 0, 7)))){
+            System.out.println("Resume received!");
+            ltp.getPacketBuffer().resumeStream(splitMessage[1]);
+        }
+        else{
             application.receiveData(splitMessage[0], Arrays.copyOfRange(data, splitMessage[0].getBytes().length+1, data.length));
         }
     }

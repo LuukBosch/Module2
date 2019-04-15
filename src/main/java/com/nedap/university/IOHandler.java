@@ -58,8 +58,8 @@ public class IOHandler extends Thread{
                 System.out.println("Packet Dropped!!!!!!!!!!!!!!!!!");
                 packet.print();
             } else {*/
-                System.out.println("Packet Send is:");
-                packet.print();
+                //System.out.println("Packet Send is:");
+                //packet.print();
                 socket.send(packetDatagram);
 
 

@@ -45,8 +45,8 @@ public class LTP {
         byte[] data = new byte[input.getLength()];
         System.arraycopy(input.getData(), input.getOffset(), data, 0, input.getLength());
         Packet inputPacket = new Packet(data);
-        System.out.println("packet received is.");
-        inputPacket.print();
+        //System.out.println("packet received is.");
+        //inputPacket.print();
         if (checkUnacked(inputPacket) && checkCorrupted(inputPacket)) {
             switch (status) {
                 case UNCONNECTED:
@@ -122,7 +122,6 @@ public class LTP {
             for(int i = 0; i<unAcked.size(); i++){
                 if (unAcked.get(i).getHeader().getSeqNum() == input.getHeader().getAckNum()) {
                     unAcked.remove(unAcked.get(i));
-                    System.out.println("removed from que");
                     return true;
                 } else if(input.getHeader().getSynFlag() && input.getHeader().getAckFlag()
                         && unAcked.get(i).getHeader().getSeqNum() +1 == input.getHeader().getAckNum()){
