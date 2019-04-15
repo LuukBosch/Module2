@@ -11,17 +11,16 @@ import java.util.HashMap;
 
 public class Application {
     private String name;
-    private int port;
     private NasProtocolHandler nasProtocol;
     private DataHandler dataHandler;
-    private ArrayList<NasServer> connections = new ArrayList<>();
+    private NasServer connectedNasServer;
     private ArrayList<NasServer> availableServers = new ArrayList<>();
     private HashMap<String, BufferedOutputStream> readers;
+    private boolean connected;
 
 
     public Application(String name, int port){
         this.name = name;
-        this.port = port;
         nasProtocol = new NasProtocolHandler(this, name, port);
         sendBroadcast(port, "hello");
         dataHandler = new DataHandler();
@@ -32,22 +31,28 @@ public class Application {
         nasProtocol.setupConnection(address, port);
     }
 
-    public void getFile(String file ,NasServer server){
-        FileOutputStream fout = null;
-        try {
-            fout = new FileOutputStream(System.getProperty("user.home") + "/files/" + file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public void getFile(String file) {
+        if (connected) {
+            FileOutputStream fout = null;
+            try {
+                fout = new FileOutputStream(System.getProperty("user.home") + "/files/" + file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            BufferedOutputStream bout = new BufferedOutputStream(fout);
+            readers.put(file, bout);
+            nasProtocol.getRequest(file);
         }
-        BufferedOutputStream bout = new BufferedOutputStream(fout);
-        readers.put(file, bout);
-        nasProtocol.getRequest(file);
-
-
     }
 
     public void postFile(String file){
-        //nasProtocol.postRequest(file);
+        try {
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(System.getProperty("user.home") + "/files/" + file));
+            nasProtocol.postFile(bis, file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void pauzeDownload(String file){
@@ -74,13 +79,21 @@ public class Application {
         }
     }
 
-    public void receivePost(String getRequest){
-        // start download procedure
+
+
+    public void receivePost(String postRequest){
+        try {
+            FileOutputStream fout = new FileOutputStream(System.getProperty("user.home") + "/files/" + postRequest);
+            BufferedOutputStream bout = new BufferedOutputStream(fout);
+            readers.put(postRequest, bout);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void connected(InetAddress address, int port){
-        connections.add(getServer(address, port));
-
+        connected = true;
+        connectedNasServer = getServer(address, port);
     }
 
     public void receiveMessage(String file, byte[] packet){
@@ -103,9 +116,6 @@ public class Application {
 
     }
 
-    public ArrayList<NasServer> getConnections() {
-        return connections;
-    }
 
     public ArrayList<NasServer> getAvailableServers() {
         return availableServers;
@@ -120,7 +130,7 @@ public class Application {
         if(stringMessage[0].equals("hello")){
             sendBroadcast( port, "LDP/" + name + "/" + dataHandler.getFileList());
         } else if(stringMessage[0].equals("LDP")) {
-            if (!isKnown(stringMessage[1])) {
+            if (stringMessage.length == 3 && !isKnown(stringMessage[1])) {
                 NasServer nasServer = new NasServer(address, port, stringMessage[1], stringMessage[2]);
                 availableServers.add(nasServer);
             }
@@ -136,7 +146,7 @@ public class Application {
         return null;
     }
 
-    public boolean isKnown(String name){ //TODO niet allen op naam?
+    public boolean isKnown(String name){
         for(NasServer server: availableServers){
             if(server.getName().equals(name)){
                 return true;

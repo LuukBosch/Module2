@@ -46,15 +46,23 @@ public class IOHandler extends Thread{
 
     public void send(DatagramSocket socket) throws IOException {
         if(ltp.hasMessage()) {
+            //int rand = (int)(Math.random() * 10) + 1;
             Packet packet = ltp.getMessage();
             DatagramPacket packetDatagram = new DatagramPacket(packet.getPacket(),
                     packet.getPacket().length, ltp.getConnectedAddress(), ltp.getConnectedPort());
-            if(!(packet.getHeader().getAckFlag() && packet.getData().length == 0)) {
+            if (!(packet.getHeader().getAckFlag() && packet.getData().length == 0)) {
                 ltp.addToUnacked(packet);
             }
-            //System.out.println("packet send!");
-            //packet.print();
-            socket.send(packetDatagram);
+            /*
+            if(rand == 5){
+                System.out.println("Packet Dropped!!!!!!!!!!!!!!!!!");
+                packet.print();
+            } else {*/
+                System.out.println("Packet Send is:");
+                packet.print();
+                socket.send(packetDatagram);
+
+
         } else if(!ltp.getBroadcastQueue().isEmpty()){
             socket.send(ltp.getBroadcastQueue().remove());
         }

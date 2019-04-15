@@ -51,6 +51,7 @@ public class PacketBuffer {
                         data = new byte[packetSize];
                     } else{
                         data = new byte[bis.available()];
+                        bis.close();
                         files.remove(file);
                         lastpacket = true;
                     }
@@ -75,7 +76,7 @@ public class PacketBuffer {
 
             }
         }
-        while (ltp.getSendQueue().size() < 10000 && !buffer.isEmpty()) {
+        while (ltp.getSendQueue().size() < 1 && !buffer.isEmpty()) {
             ltp.getSendQueue().add(buffer.remove());
         }
 

@@ -45,8 +45,8 @@ public class LTP {
         byte[] data = new byte[input.getLength()];
         System.arraycopy(input.getData(), input.getOffset(), data, 0, input.getLength());
         Packet inputPacket = new Packet(data);
-        //System.out.println("packet received is.");
-        //inputPacket.print();
+        System.out.println("packet received is.");
+        inputPacket.print();
         if (checkUnacked(inputPacket) && checkCorrupted(inputPacket)) {
             switch (status) {
                 case UNCONNECTED:
@@ -79,8 +79,10 @@ public class LTP {
                         }
                     break;
             }
-        } else if(!checkUnacked(inputPacket)){//TODO klopt niet?
-            sendQueue.add(new Packet());
+        } else{
+            System.out.println("Niet goed!");
+            System.out.println(checkCorrupted(inputPacket));
+
         }
     }
 
@@ -139,9 +141,10 @@ public class LTP {
 
     public void addRetransmission(){
         if(!unAcked.isEmpty()) {
-            System.out.println("retransmission!");
+            System.out.println("retransmission!!!!!!!!!!!!");
             unAcked.get(0).print();
             sendQueue.add(unAcked.get(0));
+            unAcked.remove(0);
         }
     }
 
@@ -183,6 +186,7 @@ public class LTP {
         if(status != CONNECTED){
             packetBuffer.refillQueue();
             Packet packet = sendQueue.remove();
+            packet.getHeader().setChecksum(0);
             packet.setChecksum();
             return packet;
         } else {
@@ -190,6 +194,7 @@ public class LTP {
             packet.getHeader().setAckNum(latestSeqReceived);
             packet.getHeader().setSeqNum(latestSeqSend + packet.getData().length);
             packet.getHeader().setAckFlag();
+            packet.getHeader().setChecksum(0);
             packet.setChecksum();
             packetBuffer.refillQueue();
             return packet;

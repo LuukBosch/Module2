@@ -21,10 +21,9 @@ public class NasProtocolHandler {
         ltp.getPacketBuffer().addToBuffer(("GET/" + file).getBytes());
     }
 
-
-
-    public void PostFile(String file) {
-        //ltp.send("POST/" + file);
+    public void postFile( BufferedInputStream reader, String file) {
+        ltp.getPacketBuffer().addToBuffer(("POST/" + file).getBytes());
+        ltp.getPacketBuffer().addFilestoSend(file, reader);
     }
 
 

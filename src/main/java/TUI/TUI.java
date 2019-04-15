@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class TUI extends Thread {
     private Application application;
-    private static int EXIT = 5;
+    private static int EXIT = 6;
 
 
     public TUI(Application application){
@@ -35,7 +35,8 @@ public class TUI extends Thread {
         System.out.println("▐  Available files...................2 ▍");
         System.out.println("▐  Start connection..................3 ▍");
         System.out.println("▐  Get File..........................4 ▍");
-        System.out.println("▐  Exit..............................5 ▍");
+        System.out.println("▐  Post file.........................5 ▍");
+        System.out.println("▐  Exit..............................6 ▍");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
     }
 
@@ -85,6 +86,9 @@ public class TUI extends Thread {
         } else if(choice == 4){
             String file = readStringWithPrompt("what file do you want?");
             getFile(file);
+        } else if(choice == 5){
+            String file = readStringWithPrompt("what file do you want to post?");
+            postFile(file);
         }
     }
 
@@ -92,10 +96,6 @@ public class TUI extends Thread {
         int count = 1;
         for(NasServer server: application.getAvailableServers()){
             System.out.print(count + ".   " + server.getName());
-            if(application.getConnections().contains(server)){
-                System.out.println("  ✅");
-            }
-
             count++;
         }
     }
@@ -115,8 +115,12 @@ public class TUI extends Thread {
     }
 
     public void getFile(String file){
-        application.getFile(file, application.getAvailableServers().get(0));
+        application.getFile(file);
 
+    }
+
+    public void postFile(String file){
+        application.postFile(file);
     }
 
 
