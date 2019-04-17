@@ -62,7 +62,6 @@ task deploy {
         ssh.run {
             session(remotes.pi) {
                 put from: "build/libs/NUM2-${version}.jar", into: "/home/pi/NUM2.jar"
-                execute 'sudo systemctl restart num2.service'
             }
         }
     }

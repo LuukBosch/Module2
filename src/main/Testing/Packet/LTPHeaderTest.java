@@ -72,22 +72,7 @@ public class LTPHeaderTest {
         assertEquals(100, header.getSeqNum());
     }
 
-    /*
-    @Test
-    public void setConnectionNum(){
-        header.setConnectionNum(100);
-        assertEquals(100, header.getConnectionNum());
-    }
-    @Test
-    public void setConnectionNum2(){
-        byte[] temp = new byte[2];
-        temp[1] = 100;
-        header.setConnectionNum(temp);
-        assertEquals(100, header.getConnectionNum());
 
-
-    }
-    */
 
     @Test
     public void getFlags() {

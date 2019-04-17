@@ -10,15 +10,9 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class Main {
-    private boolean exit = false;
-    private IOHandler ioHandler;
-    private String name;
-    private static final String broadcastMessage = "hello";
-    private TUI tui;
-
 
     public static void main(String[] args) throws IOException {
-        Application test = new Application("nietPi", 8045);
+        Application test = new Application(config.NAME, config.PORTNUMBER);
         TUI tui = new TUI(test);
         tui.start();
     }

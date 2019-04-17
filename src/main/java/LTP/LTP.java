@@ -34,7 +34,6 @@ public class LTP {
     private Queue<Packet> sendQueue = new LinkedList<>();
     private Queue<Packet> retransmissionQueue = new LinkedList<>();
     private Queue<DatagramPacket> broadcastQueue = new LinkedList<>();
-    private InputHandler inputHandler;
     private IOHandler ioHandler;
 
 
@@ -93,14 +92,12 @@ public class LTP {
                             if (sendQueue.isEmpty()) {
                                 sendQueue.add(new Packet());
                             }
-                            //System.out.println(inputPacket.getHeader().getSeqNum());
                             nasProtocolHandler.receive(inputPacket.getData());
                          }
                         }
                     break;
             }
         } else{
-            System.out.println("niet goed!");
             System.out.println(checkCorrupted(inputPacket));
             if(latestSeqReceived == inputPacket.getHeader().getSeqNum() &&  inputPacket.getData().length != 0 &&status == CONNECTED){
                 Packet packet = new Packet();
@@ -131,11 +128,9 @@ public class LTP {
                 } else if(input.getHeader().getSynFlag() && input.getHeader().getAckFlag()
                         && unAcked.get(i).getHeader().getSeqNum() +1 == input.getHeader().getAckNum()){
                     unAcked.remove(unAcked.get(i));
-                    System.out.println("syn removed!");
                     return true;
                 } else if(status == SYNACKSEND && input.getHeader().getAckFlag() && unAcked.get(i).getHeader().getSeqNum() + 1 == input.getHeader().getAckNum()){
                     unAcked.remove(unAcked.get(i));
-                    System.out.println("synack removed!");
                     return true;
                 }
             }
@@ -191,7 +186,6 @@ public class LTP {
         if(!unAcked.isEmpty()) {
             //System.out.println("retransmission!!!!!!!!!!!!");
             if(!unAcked.isEmpty()) {
-                unAcked.get(0).print();
                 retransmissionQueue.add(unAcked.get(0));
                 unAcked.remove(0);
             }
@@ -209,7 +203,6 @@ public class LTP {
             InetAddress address = InetAddress.getByName("172.16.1.255");
             byte[] buffer = message.getBytes();
             DatagramPacket broadcast = new DatagramPacket(buffer, buffer.length, address, port);
-            System.out.println("added to broadcast queue");
             broadcastQueue.add(broadcast);
 
         } catch (UnknownHostException e) {
@@ -324,6 +317,10 @@ public class LTP {
         retransmissionQueue.clear();
         broadcastQueue.clear();
         packetBuffer.clear();
+    }
+
+    public void exit(){
+        ioHandler.exit();
     }
 
 }

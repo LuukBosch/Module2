@@ -13,7 +13,7 @@ import java.util.*;
 
 
 public class IOHandler extends Thread{
-    private static final int TIMEOUT =300;
+    private static final int TIMEOUT =600;
     private String name;
     private int port;
     private InputHandler inputHandler;
@@ -33,17 +33,17 @@ public class IOHandler extends Thread{
     }
 
     public void run(){
-            try(DatagramSocket socket = new DatagramSocket(port)) {
-                while(!stopped) {
-                    socket.setBroadcast(true);
-                    socket.setSoTimeout(TIMEOUT);
-                    this.send(socket);
-                    this.receive(socket);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-
+        try(DatagramSocket socket = new DatagramSocket(port)) {
+            while(!stopped) {
+                socket.setBroadcast(true);
+                socket.setSoTimeout(TIMEOUT);
+                this.send(socket);
+                this.receive(socket);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
     }
 
     public void send(DatagramSocket socket) throws IOException {
@@ -54,10 +54,7 @@ public class IOHandler extends Thread{
             if (!(packet.getHeader().getAckFlag() && packet.getData().length == 0)) {
                 ltp.addToUnacked(packet);
             }
-
-                //System.out.println("Packet send is: ");
-                //packet.print();
-                socket.send(packetDatagram);
+            socket.send(packetDatagram);
 
         } else if(!ltp.getBroadcastQueue().isEmpty()){
             socket.send(ltp.getBroadcastQueue().remove());
@@ -65,7 +62,7 @@ public class IOHandler extends Thread{
     }
 
     public void receive(DatagramSocket socket) throws IOException {
-        byte[] buffer = new byte[61000];
+        byte[] buffer = new byte[17000];
         DatagramPacket receivedDatagram = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(receivedDatagram);

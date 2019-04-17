@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class TUI extends Thread {
     private Application application;
-    private static int EXIT = 9;
+    private static int EXIT = 10;
 
 
     public TUI(Application application) {
@@ -36,7 +36,8 @@ public class TUI extends Thread {
         System.out.println("▐  Pause download....................6 ▍");
         System.out.println("▐  Resume download...................7 ▍");
         System.out.println("▐  Disconnect........................8 ▍");
-        System.out.println("▐  Exit..............................9 ▍");
+        System.out.println("▐  SendBroadCast.....................9 ▍");
+        System.out.println("▐  Exit..............................10 ▍");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
     }
 
@@ -64,7 +65,9 @@ public class TUI extends Thread {
                 application.disconnect();
                 application.connected = false;
             } else if (choice ==9) {
-                //application.exit();
+                application.sendBroadcast(application.port, "hello");
+            } else if (choice ==10) {
+                application.exit();
             } else{
                 System.out.println("Invalid Choice!");
         }

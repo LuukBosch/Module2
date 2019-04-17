@@ -5,7 +5,6 @@ import nasprotocol.NasProtocolHandler;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,6 +21,7 @@ public class Application {
     public boolean connected;
     public NasServer connectedNasServer;
     private String name;
+    public int port;
     private NasProtocolHandler nasProtocol;
     private DataHandler dataHandler = new DataHandler();
     private ArrayList<NasServer> availableServers = new ArrayList<>();
@@ -35,6 +35,7 @@ public class Application {
      * @param port Port number the application uses for sending/receiving
      */
     public Application(String name, int port) {
+        this.port = port;
         this.name = name;
         nasProtocol = new NasProtocolHandler(this, name, port);
         sendBroadcast(port, "hello");
@@ -160,7 +161,7 @@ public class Application {
     public void receiveData(String file, byte[] data) {
         try {
             if ("LAST/".equals(new String(Arrays.copyOfRange(data, 0, 5)))) {
-                System.out.println("last message!");
+                System.out.println(file + "     is received!");
                 System.out.println("received Checksum is:   " + new String(data).split("/")[1]);
                 System.out.println("calculated checksum is:    " + checkedOutputStreams.get(file).getChecksum().getValue());
                 if (Arrays.equals(Arrays.copyOfRange(data, 5, 15), ("" + checkedOutputStreams.get(file).getChecksum().getValue()).getBytes())) {
@@ -275,20 +276,7 @@ public class Application {
         nasProtocol.disconnect();
     }
 
-
-    public boolean isKnown(String name) {
-        for (NasServer server : availableServers) {
-            if (server.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public void start() {
-        nasProtocol.start();
+    public void exit(){
+        nasProtocol.exit();
     }
 }
-
-

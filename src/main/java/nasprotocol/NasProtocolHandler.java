@@ -88,8 +88,8 @@ public class NasProtocolHandler {
         ltp.disconnect();
     }
 
-    public void error(String string){
-        application.error(string);
+    public void exit(){
+        ltp.exit();
     }
 
     public void start(){

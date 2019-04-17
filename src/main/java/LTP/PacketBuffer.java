@@ -1,14 +1,13 @@
 package LTP;
 
 import Packet.Packet;
+import com.nedap.university.config;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.zip.CheckedInputStream;
 
 /**
@@ -16,7 +15,7 @@ import java.util.zip.CheckedInputStream;
  */
 public class PacketBuffer {
     private LTP ltp;
-    private int packetSize = 60000;
+    private int packetSize = 16000;
     private int bufferSize = 5;
     private HashMap<String, BufferedInputStream> files = new HashMap<>();
     private HashMap<String, BufferedInputStream> pausedStreams = new HashMap<>();
@@ -104,8 +103,8 @@ public class PacketBuffer {
      */
     public void pauseStream(String file){
         System.out.println("paused: " + file);
-            pausedStreams.put(file, files.get(file));
-            files.remove(file);
+        pausedStreams.put(file, files.get(file));
+        files.remove(file);
 
     }
 
@@ -135,6 +134,7 @@ public class PacketBuffer {
         files.clear();
         checkedinputStreams.clear();
     }
+
 
     public void cleanup(ArrayList<String> toBeRemoved){
         for(String file: toBeRemoved){

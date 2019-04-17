@@ -47,8 +47,6 @@ public class Packet {
 
     }
 
-
-
     public void setChecksum(){ //TODO checksum in getPacket()?
         Checksum checksum = new CRC32();
         // update the current checksum with the specified array of bytes
