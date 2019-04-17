@@ -6,14 +6,14 @@ It contains a application that can serve as a server/client for reliable data tr
 
 # Run the application
 
-Clone the repository.
-Create a folder named 'files' in your home directory on both Pi and Computer.
-Connect with the Raspberry using Wifi.
-Build the project using gradle.
-Deploy the application using the gradle deploy function
-run the NUM2 jar(present in the Pi's home directory).
-run the NUM2 jar on your own machine
-The TUI that starts should be self explanatory
+Clone the repository.<br />
+Create a folder named 'files' in your home directory on both Pi and Computer.<br />
+Connect with the Raspberry using Wifi.<br />
+Build the project using gradle.<br />
+Deploy the application using the gradle deploy function<br />
+run the NUM2 jar(present in the Pi's home directory).<br />
+run the NUM2 jar on your own machine<br />
+The TUI that starts should be self explanatory<br />
 
 
 # Sidenotes
