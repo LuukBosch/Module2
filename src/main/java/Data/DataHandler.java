@@ -20,7 +20,6 @@ public class DataHandler {
         }
     }
 
-
     public static String getFileList(){
         File folder = new File(PATH);
         System.getProperty("user.home");
@@ -46,13 +45,9 @@ public class DataHandler {
             }
 
         }
-
-
         return null;
     }
-
     public boolean hasFile(String file){
         return files.contains(file);
     }
-
 }

@@ -8,6 +8,9 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.zip.CheckedInputStream;
 
+/**
+ * Class Directing all the NasProtocol Messages received by the LTP layer and Send by the Application layer.
+ */
 public class NasProtocolHandler {
     private LTP ltp;
     Application application;
@@ -52,6 +55,7 @@ public class NasProtocolHandler {
             application.receivePost(splitMessage[1]);
 
         } else if("PAUSE/".equals(new String(Arrays.copyOfRange(data, 0, 6)))) {
+            System.out.println("Pause received!");
             ltp.getPacketBuffer().pauseStream(splitMessage[1]);
         } else if("RESUME/".equals(new String(Arrays.copyOfRange(data, 0, 7)))){
             System.out.println("Resume received!");
@@ -71,14 +75,26 @@ public class NasProtocolHandler {
     }
 
     public void sendBroadCast(int port, String message){
+        System.out.println("Broadcast send ltp  " + message);
         ltp.sendBroadCast(port, message);
+
     }
 
     public void receiveBroadCast(InetAddress address, int port, byte[] message){
         application.receiveBroadcast(address, port, message);
     }
 
+    public void disconnect(){
+        ltp.disconnect();
+    }
 
+    public void error(String string){
+        application.error(string);
+    }
+
+    public void start(){
+        //ltp.start();
+    }
 
 
 

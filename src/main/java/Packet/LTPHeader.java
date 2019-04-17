@@ -24,7 +24,6 @@ public class LTPHeader {
         setSeqNum(Arrays.copyOfRange(header, 0, 4));
         setAckNum(Arrays.copyOfRange(header, 4, 8));
         setFlags(header[8]);
-        //setConnectionNum(Arrays.copyOfRange(header, 9, 11));
         setChecksum(Arrays.copyOfRange(header, 9, 13));
     }
 
@@ -104,18 +103,7 @@ public class LTPHeader {
         setChecksum(this.checksum);
     }
 
-    /*
-    public void setConnectionNum(int connectionNum){
-        this.connectionNum = connectionNum;
-        header[9] = (byte) ((this.connectionNum >> 8) & 0xff);
-        header[10] = (byte) (this.connectionNum & 0xff);
-    }
 
-    public void setConnectionNum(byte[] connectionNum){
-        this.connectionNum = ((connectionNum[0] & 0xff) << 8) | (connectionNum[1] & 0xff);
-        setConnectionNum(this.connectionNum);
-    }
-    */
     //---------------------Getters--------------------------------
     public BitSet getFlags() {
         return flags;
@@ -150,11 +138,6 @@ public class LTPHeader {
         return flags.get(2);
     }
 
-    /*
-    public int getConnectionNum(){
-        return connectionNum;
-    }
-    */
 
 
 

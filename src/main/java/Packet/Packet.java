@@ -66,7 +66,6 @@ public class Packet {
         System.out.println("ack flag:       " + getHeader().getAckFlag());
         System.out.println("syn flag:       " + getHeader().getSynFlag());
         System.out.println("fin flag:       " + getHeader().getFinFlag());
-        //System.out.println("connection num: " + getHeader().getConnectionNum());
         System.out.println("data lenght:    " + data.length);
         System.out.println(" ");
 

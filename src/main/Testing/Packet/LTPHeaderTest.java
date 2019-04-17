@@ -97,26 +97,6 @@ public class LTPHeaderTest {
         assertEquals(7, header.getFlags().toByteArray()[0]);
     }
 
-    @Test
-    public void getHeader() {
-        byte[] byteheader = new byte[11];
-        byteheader[3] = 100;
-        byteheader[7] = 100;
-        byteheader[8] = 3;
-        byteheader[9] = 15;
-        byteheader[10] = 15;
-        header.setSynFlag();
-        header.setAckFlag();
-        header.setAckNum(100);
-        header.setSeqNum(100);
-        //header.setConnectionNum(3855);
-        assertArrayEquals(byteheader, header.getHeader());
-        assertArrayEquals(byteheader, header2.getHeader());
-        assertTrue(header2.getAckFlag());
-        assertTrue(header2.getSynFlag());
-        assertFalse(header2.getFinFlag());
-    }
-
 
     @Test
     public void getSynFlag() {

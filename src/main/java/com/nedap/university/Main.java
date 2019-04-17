@@ -18,10 +18,9 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException {
-        Application test = new Application("test", 7584);
+        Application test = new Application("nietPi", 8045);
         TUI tui = new TUI(test);
         tui.start();
-
     }
 
 }

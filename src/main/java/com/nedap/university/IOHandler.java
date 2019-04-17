@@ -3,7 +3,9 @@ package com.nedap.university;
 
 import LTP.LTP;
 import Packet.Packet;
+import nasprotocol.NasProtocolHandler;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.*;
 
@@ -17,9 +19,8 @@ public class IOHandler extends Thread{
     private InputHandler inputHandler;
     private LTP ltp;
     private boolean stopped = false;
-    //private Queue<Packet> sendQueue = new LinkedList<>();
-    private Queue<DatagramPacket> broadcastqueue = new LinkedList<>();
     int count;
+
 
 
     public IOHandler(LTP ltp, String name, int port){
@@ -41,27 +42,22 @@ public class IOHandler extends Thread{
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+
             }
     }
 
     public void send(DatagramSocket socket) throws IOException {
         if(ltp.hasMessage()) {
-            //int rand = (int)(Math.random() * 10) + 1;
             Packet packet = ltp.getMessage();
             DatagramPacket packetDatagram = new DatagramPacket(packet.getPacket(),
                     packet.getPacket().length, ltp.getConnectedAddress(), ltp.getConnectedPort());
             if (!(packet.getHeader().getAckFlag() && packet.getData().length == 0)) {
                 ltp.addToUnacked(packet);
             }
-            /*
-            if(rand == 5){
-                System.out.println("Packet Dropped!!!!!!!!!!!!!!!!!");
-                packet.print();
-            } else {*/
-                //System.out.println("Packet Send is:");
+
+                //System.out.println("Packet send is: ");
                 //packet.print();
                 socket.send(packetDatagram);
-
 
         } else if(!ltp.getBroadcastQueue().isEmpty()){
             socket.send(ltp.getBroadcastQueue().remove());
@@ -69,7 +65,7 @@ public class IOHandler extends Thread{
     }
 
     public void receive(DatagramSocket socket) throws IOException {
-        byte[] buffer = new byte[1500];
+        byte[] buffer = new byte[61000];
         DatagramPacket receivedDatagram = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(receivedDatagram);
@@ -83,10 +79,10 @@ public class IOHandler extends Thread{
 
 
 
+
     public void exit(){
         stopped = true;
     }
-
 
     public static InetAddress getFirstNonLoopbackAddress() throws SocketException {
         Enumeration en = NetworkInterface.getNetworkInterfaces();

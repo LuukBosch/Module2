@@ -2,12 +2,9 @@ package com.nedap.university;
 
 
 import LTP.LTP;
-
-
 import java.net.DatagramPacket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Arrays;
+
 
 public class InputHandler {
     private IOHandler ioHandler;
